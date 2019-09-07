@@ -75,11 +75,6 @@ int CFG_save_on_exit = FALSE;
 #define SYSTEM_WIDE_CFG_FILE "/etc/atari800.cfg"
 #endif
 
-#ifdef WIIU
-#define DEFAULT_CFG_NAME "sd:/retroarch/cores/system/atari800.cfg"
-#define SYSTEM_WIDE_CFG_FILE "sd:/retroarch/cores/system/atari800.cfg"
-#endif
-
 static char rtconfig_filename[FILENAME_MAX];
 
 int CFG_LoadConfig(const char *alternate_config_filename)
@@ -158,6 +153,8 @@ int CFG_LoadConfig(const char *alternate_config_filename)
 				else
 					Util_strlcpy(UI_saved_files_dir[UI_n_saved_files_dir++], ptr, FILENAME_MAX);
 			}
+			else if (strcmp(string, "SHOW_HIDDEN_FILES") == 0)
+				UI_show_hidden_files = Util_sscanbool(ptr);
 			else if (strcmp(string, "DISK_DIR") == 0 || strcmp(string, "ROM_DIR") == 0
 				  || strcmp(string, "EXE_DIR") == 0 || strcmp(string, "STATE_DIR") == 0) {
 				/* ignore blank and "." values */
@@ -181,6 +178,8 @@ int CFG_LoadConfig(const char *alternate_config_filename)
 					Log_print("Unsafe PRINT_COMMAND ignored");
 			}
 
+			else if (strcmp(string, "ACCURATE_SKIPPED_FRAMES") == 0)
+				Atari800_collisions_in_skipped_frames = Util_sscanbool(ptr);
 			else if (strcmp(string, "SCREEN_REFRESH_RATIO") == 0)
 				Atari800_refresh_rate = Util_sscandec(ptr);
 			else if (strcmp(string, "DISABLE_BASIC") == 0)
@@ -381,6 +380,7 @@ int CFG_WriteConfig(void)
 		fprintf(fp, "ATARI_FILES_DIR=%s\n", UI_atari_files_dir[i]);
 	for (i = 0; i < UI_n_saved_files_dir; i++)
 		fprintf(fp, "SAVED_FILES_DIR=%s\n", UI_saved_files_dir[i]);
+	fprintf(fp, "SHOW_HIDDEN_FILES=%d\n", UI_show_hidden_files);
 #endif
 	for (i = 0; i < 4; i++)
 		fprintf(fp, "H%c_DIR=%s\n", '1' + i, Devices_atari_h_dir[i]);
@@ -392,6 +392,7 @@ int CFG_WriteConfig(void)
 
 #ifndef BASIC
 	fprintf(fp, "SCREEN_REFRESH_RATIO=%d\n", Atari800_refresh_rate);
+	fprintf(fp, "ACCURATE_SKIPPED_FRAMES=%d\n", Atari800_collisions_in_skipped_frames);
 #endif
 
 	fprintf(fp, "MACHINE_TYPE=Atari %s\n", machine_type_string[Atari800_machine_type]);

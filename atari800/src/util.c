@@ -51,10 +51,6 @@
 # endif
 #endif
 
-#ifdef VITA
-#include <psp2/kernel/threadmgr.h>
-#endif
-
 #include "atari.h"
 #include "platform.h"
 #include "util.h"
@@ -84,6 +80,18 @@ int Util_stricmp(const char *str1, const char *str2)
 	return retval;
 }
 #endif
+
+int Util_strnicmp(const char *str1, const char *str2, size_t size)
+{
+	int retval = 0;
+
+	while((size-- > 0) && ((retval = tolower(*str1) - tolower(*str2++)) == 0))
+	{
+		if (*str1++ == '\0')
+			break;
+	}
+	return retval;
+}
 
 char *Util_stpcpy(char *dest, const char *src)
 {
@@ -184,7 +192,7 @@ void Util_trim(char *s)
 int Util_sscandec(const char *s)
 {
 	int result;
-	if (*s == '\0')
+	if (s == NULL || *s == '\0')
 		return -1;
 	result = 0;
 	for (;;) {
@@ -201,6 +209,9 @@ int Util_sscandec(const char *s)
 int Util_sscansdec(char const *s, int *dest)
 {
 	int minus = FALSE;
+
+	if (s == NULL || dest == NULL) return FALSE;
+
 	switch(*s) {
 	case '-':
 		minus = TRUE;
@@ -221,6 +232,8 @@ int Util_sscandouble(char const *s, double *dest)
 	char *endptr;
 	double result;
 
+	if (s == NULL || dest == NULL) return FALSE;
+
 	result = strtod(s, &endptr);
 	if (endptr[0] != '\0' || errno == ERANGE)
 		return FALSE;
@@ -232,7 +245,7 @@ int Util_sscandouble(char const *s, double *dest)
 int Util_sscanhex(const char *s)
 {
 	int result;
-	if (*s == '\0')
+	if (s == NULL || *s == '\0')
 		return -1;
 	result = 0;
 	for (;;) {
@@ -252,6 +265,7 @@ int Util_sscanhex(const char *s)
 
 int Util_sscanbool(const char *s)
 {
+	if (s == NULL) return -1;
 	if (*s == '0' && s[1] == '\0')
 		return 0;
 	if (*s == '1' && s[1] == '\0')
@@ -470,7 +484,7 @@ double Util_time(void)
 #elif defined(HAVE_UCLOCK)
 	return uclock() * (1.0 / UCLOCKS_PER_SEC);
 #elif defined(HAVE_CLOCK)
-	return clock() * (1.0 / CLK_TCK);
+	return clock() * (1.0 / CLOCKS_PER_SEC);
 #else
 #error No function found for Util_time()
 #endif
@@ -481,13 +495,6 @@ double Util_time(void)
 
 void Util_sleep(double s)
 {
-#if defined(WIIU)
-/* no need to sleep on retroarch (we are awake) so bypass it for wiiu */ 
-return;
-#elif defined(VITA)
-   sceKernelDelayThread(1e6 * s);
-#else
-
 #ifdef SUPPORTS_PLATFORM_SLEEP
 	PLATFORM_Sleep(s);
 #else /* !SUPPORTS_PLATFORM_SLEEP */
@@ -524,6 +531,4 @@ return;
 #endif
 	}
 #endif /* !SUPPORTS_PLATFORM_SLEEP */
-
-#endif
 }

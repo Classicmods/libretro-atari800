@@ -4,6 +4,9 @@
 #include "config.h"
 #include <stdio.h>
 #include <string.h>
+#if HAVE_STRINGS_H
+#include <strings.h>
+#endif
 #include <math.h>
 #include <ctype.h>
 #ifdef HAVE_WINDOWS_H
@@ -30,6 +33,9 @@ int Util_stricmp(const char *str1, const char *str2);
 #else
 #define Util_stricmp stricmp
 #endif
+
+/* Same as strncasecmp(), compare 2 strings, limited to size. */
+int Util_strnicmp(const char *str1, const char *str2, size_t size);
 
 /* Same as stpcpy() in some C libraries: copies src to dest
    and returns a pointer to the trailing NUL in dest. */

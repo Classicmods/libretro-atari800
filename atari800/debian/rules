@@ -9,15 +9,11 @@ P=atari800
 
 ARCH := $(shell dpkg-architecture -qDEB_BUILD_ARCH)
 
-# Special Debian build options - nostrip yet un-handled
-export CFLAGS
-CFLAGS += -g -Wall
-ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
-CFLAGS += -O0
-else
-CFLAGS += -O3
-endif
-
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+DPKG_EXPORT_BUILDFLAGS = 1
+include /usr/share/dpkg/buildflags.mk
+CFLAGS+=$(CPPFLAGS)
+CXXFLAGS+=$(CPPFLAGS)
 
 # Build the binary components and assemble the libraries
 # =====================================================================
@@ -30,18 +26,20 @@ build-stamp:
 	touch build-stamp
 
 bld-sdl:
-	cd src ; if [ -e Makefile ]; then $(MAKE) clean; fi
-	cd src ; ./configure \
+	cp /usr/share/misc/config.guess /usr/share/misc/config.sub src
+	if [ -e Makefile ]; then $(MAKE) clean; fi
+	./configure \
 		 --with-video=sdl --with-sound=sdl
-	cd src ; $(MAKE)
+	$(MAKE)
 
 # Clean up after a build and before building a source package
 #======================================================================
 clean:
 	$(checkdir)
 	-rm -f build-stamp
-	cd src ; if [ -e Makefile ]; then $(MAKE) clean; fi; \
+	if [ -e Makefile ]; then $(MAKE) clean; fi; \
 	 rm -f config.log config.status config.h Makefile
+	rm -f src/config.guess src/config.sub
 	mv ./atari800.spec ./tmp ; rm -f atari800 ; rm -f atari800.* ; mv ./tmp ./atari800.spec
 	-rm -rf	debian/tmp debian/*~ *~ *.orig *.log \
 		debian/files* debian/substvars*
@@ -81,7 +79,7 @@ binary-arch:		checkroot build
 	cp DOC/CREDITS debian/tmp/usr/share/doc/$(P)/CREDITS
 	cp DOC/README debian/tmp/usr/share/doc/$(P)/README
 	cp DOC/USAGE debian/tmp/usr/share/doc/$(P)/USAGE
-	gzip -9v debian/tmp/usr/share/doc/$(P)/*
+	gzip -9nv debian/tmp/usr/share/doc/$(P)/*
 
 # These are too small to gzip
 #
@@ -100,7 +98,7 @@ binary-arch:		checkroot build
 #
 	install -d debian/tmp/usr/share/man/man1
 	install -m 644 src/$(P).man debian/tmp/usr/share/man/man1/$(P).1
-	gzip -9 debian/tmp/usr/share/man/man1/$(P).1
+	gzip -9nv debian/tmp/usr/share/man/man1/$(P).1
 
 # install menu file
 #
@@ -113,6 +111,11 @@ binary-arch:		checkroot build
 	install -s src/$(P) debian/tmp/usr/bin/$(P)
 
 	strip -R .comment -R .note -R .note.ABI-tag debian/tmp/usr/bin/$(P)
+
+	# Install lintian overrides
+
+	install -d debian/tmp/usr/share/lintian/overrides
+	install -m 644 debian/atari800.lintian-overrides debian/tmp/usr/share/lintian/overrides/atari800
 
 #	(if [ "$(ARCH)" = "i386" ]; then install debian/$(P) debian/tmp/usr/bin; \
 #	else install debian/$(P).alt debian/tmp/usr/bin/$(P); fi)

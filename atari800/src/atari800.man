@@ -1,4 +1,4 @@
-.TH ATARI800 1 "2014-04-12" "Atari800 3.1.0"
+.TH ATARI800 1 "2019-04-13" "Atari800 4.1.0"
 
 .SH NAME
 atari800 \- emulator of Atari 8-bit computers and the 5200 console
@@ -52,7 +52,7 @@ Path to file containing Atari BASIC ROM.
 Used to override paths defined at compile time.
 
 .TP
-\fB\-800\-rev auto\fR|\fBa\-ntsc\fR|\fBa\-pal\fR|\fBb\-ntsc\fR|\fBcustom\fR
+\fB\-800\-rev auto\fR|\fBa\-ntsc\fR|\fBa\-pal\fR|\fBb\-ntsc\fR|\fBcustom\fR|\fBaltirra\fR
 Select operating system revision for Atari 800:
 .PP
 .RS
@@ -68,15 +68,18 @@ Use OS rev. A NTSC from early NTSC 400/800 units.
 .B a\-pal
 Use OS rev. A PAL from PAL 400/800 units.
 .TP
-.B a\-pal
+.B b\-ntsc
 Use OS rev. B NTSC from late NTSC 400/800 units.
 .TP
 .B custom
 Use a custom OS.
+.TP
+.B altirra
+Use AltirraOS that is included in the emulator.
 .PD
 .RE
 .TP
-\fB\-xl\-rev auto\fR|\fB10\fR|\fB11\fR|\fB1\fR|\fB2\fR|\fB3a\fR|\fB3b\fR|\fB5\fR|\fB3\fR|\fB4\fR|\fB59\fR|\fB59a\fR|\fBcustom\fR
+\fB\-xl\-rev auto\fR|\fB10\fR|\fB11\fR|\fB1\fR|\fB2\fR|\fB3a\fR|\fB3b\fR|\fB5\fR|\fB3\fR|\fB4\fR|\fB59\fR|\fB59a\fR|\fBcustom\fR|\fBaltirra\fR
 Select operating system revision for Atari XL/XE:
 .PP
 .RS
@@ -122,10 +125,13 @@ Use OS BB000001 rev. 59 from Kevin Savetz' Arabic 65XE: <http://www.savetz.com/v
 .TP
 .B custom
 Use a custom OS.
+.TP
+.B altirra
+Use AltirraOS that is included in the emulator.
 .PD
 .RE
 .TP
-\fB\-5200\-rev auto\fR|\fBorig\fR|\fBa\fR|\fBcustom\fR
+\fB\-5200\-rev auto\fR|\fBorig\fR|\fBa\fR|\fBcustom\fR|\fBaltirra\fR
 Select BIOS revision for Atari 5200:
 .PP
 .RS
@@ -143,10 +149,13 @@ Use BIOS rev. A from late 2\-port 5200 units.
 .TP
 .B custom
 Use a custom BIOS.
+.TP
+.B altirra
+Use Altirra BIOS that is included in the emulator.
 .PD
 .RE
 .TP
-\fB\-basic\-rev auto\fR|\fBa\fR|\fBb\fR|\fBc\fR|\fBcustom\fR
+\fB\-basic\-rev auto\fR|\fBa\fR|\fBb\fR|\fBc\fR|\fBcustom\fR|\fBaltirra\fR
 Select BASIC revision:
 .PP
 .RS
@@ -167,6 +176,9 @@ Use BASIC rev. C from late 600XL/800XL and all XE units.
 .TP
 .B custom
 Use a custom BASIC.
+.TP
+.B altirra
+Use Altirra BASIC that is included in the emulator.
 .PD
 .RE
 .TP
@@ -213,10 +225,6 @@ Emulate Atari XEGS
 .B \-5200
 Emulate Atari 5200
 .TP
-.B \-emuos
-Use EmuOS
-
-.TP
 .B \-c
 Enable RAM between 0xc000 and 0xcfff in Atari 800
 
@@ -255,7 +263,7 @@ Turn on Atari BASIC ROM
 .BI \-cart\  filename
 Insert cartridge (CART or raw format)
 .TP
-.BR "\-cart\-type 0" .. 67
+.BR "\-cart\-type 0" .. 70
 Select type of the cartridge inserted with the \fB\-cart\fR option.
 When inserting a raw ROM image its type cannot be detected automaticcaly,
 and must be provided with this option.
@@ -313,7 +321,7 @@ OSS one chip 16 KB cartridge
 One chip 16 KB 5200 cartridge
 .TP
 .B 17
-Atrax 128 KB cartridge
+Decoded Atrax 128 KB cartridge
 .TP
 .B 18
 Bounty Bob Strikes Back 40 KB cartridge
@@ -464,6 +472,15 @@ The!Cart 64 MB cartridge
 .TP
 .B 67
 XEGS 64 KB cartridge (banks 8-15)
+.TP
+.B 68
+Atrax 128 KB cartridge
+.TP
+.B 69
+aDawliah 32 KB cartridge
+.TP
+.B 70
+aDawliah 64 KB cartridge
 .PD
 .RE
 If this option is not given, the user will be asked to choose the cartridge
@@ -474,7 +491,7 @@ Insert piggyback cartridge (CART or raw format).
 This works only if the first cartridge is a pass-through (currently only
 SpartaDOS X 64KB and 128KB types).
 .TP
-.BR "\-cart2\-type 0" .. 67
+.BR "\-cart2\-type 0" .. 70
 Select type of the cartridge inserted with the \fB-cart2\fR option.
 When inserting a raw ROM image its type cannot be detected automatically,
 and must be provided with this option.
@@ -1104,6 +1121,9 @@ Use XEP80 on joystick port \fIn\fR
 .TP
 .B \-af80
 Emulate the Austin Franklin 80 column daughterboard for Atari 800.
+.TP
+.B \-volume 0..100
+Sets global volume of Atari 800.
 
 
 .SS X11 Options

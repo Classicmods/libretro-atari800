@@ -1,6 +1,6 @@
 # generic defines used by all distributions.
 #
-%define ver			3.1.0
+%define ver			4.1.0
 # When adding a target, add an $options_<target_name> variable to the %build
 # section, and add %{_bindir}/%{name}-<target_name> to the files list in the
 # %files section.
@@ -170,7 +170,7 @@ Name:			atari800
 Version:		%{ver}
 Summary:		An emulator of 8-bit Atari personal computers
 License:		GPLv2
-URL:			http://atari800.sourceforge.net/
+URL:			http://atari800.github.io/
 Source:			http://prdownloads.sourceforge.net/atari800/%{name}-%{version}.tar.gz
 Group:			%{group}
 Release:		%{rel}
@@ -201,12 +201,11 @@ options_sdl="--with-video=sdl --with-sound=sdl"
 #options_ncurses="--with-video=ncurses --with-sound=oss"
 #options_x11="--target=x11 --with-sound=oss"
 
-cd src
 for target in %{targets}
 do
 	%configure `eval echo \\\$options_${target}`
 	%{__make} %{?jobs:-j%jobs}
-	mv atari800 atari800-${target}
+	mv src/%{name} src/%{name}-${target}
 	%{__make} clean
 done
 touch atari800
@@ -218,7 +217,7 @@ mkdir -p %{buildroot}/%{_bindir}
 mkdir -p %{buildroot}/%{_mandir}/man1
 for target in %{targets}
 do
-	install -m 755 atari800-$target %{buildroot}/%{_bindir}
+	install -m 755 %{name}-$target %{buildroot}/%{_bindir}
 done
 (
 	cd %{buildroot}/%{_bindir}
